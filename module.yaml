@@ -1,11 +1,41 @@
 name: azure-vm
 type: terraform
-description: Module to provision vm on azure
+description: Module to provision Virtual machine on azure
 tags:
-  - tools
-  - devops
+  - azure
+  - azure-vm
+  - virtual-machine
 versions:
   - platforms: []
-    dependencies: []
-    variables: []
+    providers:
+      - name: azurerm
+        source: "hashicorp/azurerm"
+    dependencies:
+      - id: resource_group
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-azure-resource-group
+            version: ">= 1.0.0"
+      - id: vnet
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-azure-vnet
+            version: ">= 1.0.2"
+      - id: subnet
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-azure-subnets
+            version: ">= 1.2.2"
+    variables:
+      - name: resource_group_name
+        moduleRef:
+          id: resource_group
+          output: name
+      - name: vpc_name
+        moduleRef:
+          id: vnet
+          output: name
+      - name: subnet_id
+        moduleRef:
+          id: subnet
+          output: ids    
+      - name: region
+        scope: global
 cloudProvider: azure

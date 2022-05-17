@@ -1,24 +1,23 @@
-module "dev_tools_mymodule" {
-source = "./module"
-resource_group_name         = module.resource_group.name
-region                      = var.region
-virtual_network_name =module.vnet.name
-network_interface_name="isl-ahm-nic"
-ip_configuration_name="testConfiguration"
-subnet_id="/subscriptions/bc1627c6-ec80-4da3-8d18-03e91330e2f1/resourceGroups/rg-isl-ahm1/providers/Microsoft.Network/virtualNetworks/example-network/subnets/subnet1"
-private_ip_address_allocation="Dynamic"
-virtual_machine_name="isl-ahm-vm1"
-vm_size="Standard_DS1_v2"
-storage_image_reference_publisher="Canonical"
-storage_image_reference_offer="UbuntuServer"
-storage_image_reference_sku="16.04-LTS"
-storage_image_reference_version="latest"
-storage_os_disk_name="myosdisk1"
-storage_os_disk_caching="ReadWrite"
-storage_os_disk_create_option="FromImage"
-storage_os_disk_managed_disk_type="Standard_LRS"
-os_profile_computer_name="hostname"
-os_profile_admin_username="testadmin"
-os_profile_admin_password="Password1234!"
- 
+module "azure-vm" {
+  source                            = "./module"
+  resource_group_name               = module.azure-resource-group.name
+  region                            = var.region
+  virtual_network_name              = module.azure-vnet.name
+  network_interface_name            = var.network_interface_name
+  subnet_id                         = module.azure-vnet-subnets.ids[0]
+  ip_configuration_name             = var.ip_configuration_name
+  private_ip_address_allocation     = var.private_ip_address_allocation
+  virtual_machine_name              = var.virtual_machine_name
+  vm_size                           = var.vm_size
+  storage_image_reference_publisher = var.storage_image_reference_publisher
+  storage_image_reference_offer     = var.storage_image_reference_offer
+  storage_image_reference_sku       = var.storage_image_reference_sku
+  storage_image_reference_version   = var.storage_image_reference_version
+  storage_os_disk_name              = var.storage_os_disk_name
+  storage_os_disk_caching           = var.storage_os_disk_caching
+  storage_os_disk_create_option     = var.storage_os_disk_create_option
+  storage_os_disk_managed_disk_type = var.storage_os_disk_managed_disk_type
+  os_profile_computer_name          = var.os_profile_computer_name
+  os_profile_admin_username         = var.os_profile_admin_username
+  os_profile_admin_password         = var.os_profile_admin_password
 }
