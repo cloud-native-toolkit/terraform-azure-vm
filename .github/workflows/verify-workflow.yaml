@@ -3,6 +3,7 @@ name: Verify
 # Controls when the action will run.
 on:
   workflow_call:
+    secrets:
       AZURE_SUBSCRIPTION_ID:
         required: true
       AZURE_CLIENT_ID:
