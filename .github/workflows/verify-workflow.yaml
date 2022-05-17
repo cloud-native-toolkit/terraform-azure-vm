@@ -23,7 +23,7 @@ jobs:
     strategy:
       matrix:
         testcase:
-          - ocp4_latest
+          - azure_vpc
       fail-fast: false
 
     env:
