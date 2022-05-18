@@ -1,6 +1,6 @@
 module "azure-vm" {
   source                            = "./module"
-  resource_group_name               = module.resource-group.name
+  resource_group_name               = module.resource_group.name
   region                            = var.region
   virtual_network_name              = module.vnet.name
   network_interface_name            = "isl-ahm-nic"
