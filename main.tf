@@ -1,7 +1,3 @@
-provider "azurerm" {
-  features {}
-}
-
 resource "azurerm_network_interface" "network_interface" {
   name                = var.network_interface_name
   location            = var.region
