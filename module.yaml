@@ -28,7 +28,7 @@ versions:
         moduleRef:
           id: resource_group
           output: name
-      - name: vpc_name
+      - name: virtual_network_name
         moduleRef:
           id: vnet
           output: name
