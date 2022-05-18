@@ -1,9 +1,116 @@
 name: azure-vm
 type: terraform
-description: Module to provision vm on azure
+description: Module to provision Virtual machine on azure
 tags:
-  - tools
-  - devops
-versions: []
+  - azure
+  - azure-vm
+  - virtual-machine
+versions:
+  - platforms: []
+    providers:
+      - name: azurerm
+        source: hashicorp/azurerm
+    dependencies:
+      - id: resource_group
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-azure-resource-group
+            version: '>= 1.0.0'
+      - id: vnet
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-azure-vnet
+            version: '>= 1.0.2'
+      - id: subnet
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-azure-subnets
+            version: '>= 1.2.2'
+    variables:
+      - name: resource_group_name
+        type: string
+        description: >-
+          The name of the Azure resource group where the NAT gateway has been
+          provisioned
+        moduleRef:
+          id: resource_group
+          output: name
+      - name: region
+        type: string
+        description: The Azure location where the NAT gateway will be installed
+        scope: global
+      - name: virtual_network_name
+        type: string
+        description: The Azure virtual network name
+        moduleRef:
+          id: vnet
+          output: name
+      - name: network_interface_name
+        type: string
+        description: The Azure location where the NAT gateway will be installed
+      - name: ip_configuration_name
+        type: string
+        description: The Azure location where the NAT gateway will be installed
+      - name: subnet_id
+        type: string
+        description: The Azure subnet id
+        moduleRef:
+          id: subnet
+          output: ids
+      - name: private_ip_address_allocation
+        type: string
+        description: The Azure subnet private ip address alocation
+        default: Dynamic
+      - name: virtual_machine_name
+        type: string
+        description: This is the name of Azure VM
+      - name: vm_size
+        type: string
+        description: This is the size of Virtual Machine
+      - name: delete_os_disk_on_termination
+        type: bool
+        description: Flag to delete os disk on termination
+        default: true
+      - name: delete_data_disks_on_termination
+        type: bool
+        description: Flag to delete data disk on termination
+        default: true
+      - name: storage_image_reference_publisher
+        type: string
+        description: This is the storage image refrence publisher
+      - name: storage_image_reference_offer
+        type: string
+        description: This is the storage image refrence offer
+      - name: storage_image_reference_sku
+        type: string
+        description: This is the storage image refrence sku
+      - name: storage_image_reference_version
+        type: string
+        description: This is the storage image refrence version
+      - name: storage_os_disk_name
+        type: string
+        description: This is the storage OS disk name
+      - name: storage_os_disk_caching
+        type: string
+        description: This is the storage OS disk cashing
+      - name: storage_os_disk_create_option
+        type: string
+        description: This is the storage OS disk create option
+      - name: storage_os_disk_managed_disk_type
+        type: string
+        description: This is the storage OS disk managed disk type
+      - name: os_profile_computer_name
+        type: string
+        description: This is the storage OS Profile Computer Name
+      - name: os_profile_admin_username
+        type: string
+        description: This is the storage OS Profile Admin Username
+      - name: os_profile_admin_password
+        type: string
+        description: This is the storage OS Profile Passowrd
+        sensitive: true
+      - name: os_profile_linux_config_disable_password_authentication
+        type: bool
+        description: Flag to disable password authentication
+        default: false
+    version: v1.0.0
+    outputs: []
 cloudProvider: azure
 id: github.com/cloud-native-toolkit/terraform-azure-vm
