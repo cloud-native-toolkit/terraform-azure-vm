@@ -3,7 +3,7 @@ module "subnets" {
 
   resource_group_name = module.resource_group.name
   region              = var.region
-  vpc_name            = module.vnet.name
+  vnet_name            = module.vnet.name
   ipv4_cidr_blocks    = [cidrsubnets(var.vnet_cidr, 2)]
   acl_rules = [{
     name        = "ssh-inbound"
