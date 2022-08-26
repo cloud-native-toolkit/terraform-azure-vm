@@ -15,6 +15,12 @@ variable "name_prefix" {
   default     = ""
 }
 
+variable "vnet_cidr" {
+  type = string
+  description = "CIDR for VNet"
+  default = "10.0.0.0/18"
+}
+
 variable "enabled" {}
 
 variable "subscription_id" {}

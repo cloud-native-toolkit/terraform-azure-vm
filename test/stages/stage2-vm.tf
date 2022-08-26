@@ -1,23 +1,7 @@
 module "azure-vm" {
-  source                            = "./module"
-  resource_group_name               = module.resource_group.name
-  region                            = var.region
-  virtual_network_name              = module.vnet.name
-  network_interface_name            = "isl-ahm-nic"
-  subnet_id                         = module.subnets.ids[0]
-  ip_configuration_name             = "ip_configuration_name"
-  private_ip_address_allocation     = "Dynamic"
-  virtual_machine_name              = "isl-ahm-vm1"
-  vm_size                           = "Standard_DS1_v2"
-  storage_image_reference_publisher = "Canonical"
-  storage_image_reference_offer     = "UbuntuServer"
-  storage_image_reference_sku       = "16.04-LTS"
-  storage_image_reference_version   = "latest"
-  storage_os_disk_name              = "storage_os_disk1"
-  storage_os_disk_caching           = "ReadWrite"
-  storage_os_disk_create_option     = "FromImage"
-  storage_os_disk_managed_disk_type = "Standard_LRS"
-  os_profile_computer_name          = "hostname"
-  os_profile_admin_username         = "testadmin"
-  os_profile_admin_password         = "Password1234!"
+  source              = "./module"
+
+  name_prefix         = "${var.name_prefix}-${random_string.cluster_id.result}-vm"
+  resource_group_name = module.resource_group.name
+  subnet_id           = module.subnets.id
 }
