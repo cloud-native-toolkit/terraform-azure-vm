@@ -12,10 +12,8 @@ module "subnets" {
     source      = "*"
     destination = "*"
     tcp = {
-      port_min        = 22
-      port_max        = 22
-      source_port_min = 22
-      source_port_max = 22
+      destination_port_range = "22"
+      source_port_range = "*"
     }
     }, {
     name        = "vpn-inbound"
@@ -24,10 +22,8 @@ module "subnets" {
     source      = "*"
     destination = "*"
     udp = {
-      port_min        = 1194
-      port_max        = 1194
-      source_port_min = 1194
-      source_port_max = 1194
+      destination_port_range = "1194"
+      source_port_range = "*"
     }
   }]
 }
