@@ -1,16 +1,16 @@
 variable "resource_group_name" {
   type        = string
-  description = "The name of the Azure resource group where the NAT gateway has been provisioned"
+  description = "The name of the Azure resource group where the VM is to be provisioned. The VM will be provisioned in the same location as the resource group."
 }
 
 variable "subnet_id" {
   type        = string
-  description = "The Azure subnet id"
+  description = "The Azure subnet id to which to attach the virtual machine private NIC"
 }
 
 variable "machine_type" {
   type = string
-  description = "The type of VM to create - Linux or Windows (default = \"Linux\")"
+  description = "The type of VM to create - \"Linux\" or \"Windows\" (default = \"Linux\")"
   default = "Linux"
 }
 
@@ -21,7 +21,7 @@ variable "name_prefix" {
 
 variable "pub_ssh_key" {
   type = string
-  description = "Public SSH key for VM access"
+  description = "Public SSH key for VM access. Provide an empty variable for windows VMs as it is not used."
 }
 
 variable "public" {
@@ -60,33 +60,52 @@ variable "storage_type" {
   default     = "Standard_LRS"
 }
 
-# variable "os_disk_size" {
-#   type = bool
-#   description = "Size of OS disk (default = \"100\"). Note this must be at least as large as the OS image"
-#   default = 100
-# }
-
-// OS image properties
-variable "image_publisher" {
+// Linux OS image properties
+variable "linux_image_publisher" {
   type = string
-  description = "Image publisher name (default = \"Canonical\")"
+  description = "Linux image publisher name (default = \"Canonical\")"
   default = "Canonical"
 }
 
-variable "image_offer" {
+variable "linux_image_offer" {
   type = string
-  description = "OS image source offer (default = \"UbuntuServer\")"
+  description = "Linux OS image source offer (default = \"UbuntuServer\")"
   default = "UbuntuServer"
 }
 
-variable "image_sku" {
+variable "linux_image_sku" {
   type = string
-  description = "OS image SKU (defualt = \"16.04-LTS\")"
+  description = "Linux OS image SKU (defualt = \"16.04-LTS\")"
   default = "16.04-LTS"
 }
 
-variable "image_version" {
+variable "linux_image_version" {
   type = string
-  description = "OS image version (default = \"latest\")"
+  description = "Linux OS image version (default = \"latest\")"
+  default = "latest"
+}
+
+// Windows OS image properties
+variable "win_image_publisher" {
+  type = string
+  description = "Windows image publisher name (default = \"Canonical\")"
+  default = "MicrosoftWindowsServer"
+}
+
+variable "win_image_offer" {
+  type = string
+  description = "Windows OS image source offer (default = \"UbuntuServer\")"
+  default = "WindowsServer"
+}
+
+variable "win_image_sku" {
+  type = string
+  description = "Windows OS image SKU (defualt = \"16.04-LTS\")"
+  default = "2016-Datacenter"
+}
+
+variable "win_image_version" {
+  type = string
+  description = "Windows OS image version (default = \"latest\")"
   default = "latest"
 }
