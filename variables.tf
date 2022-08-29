@@ -19,6 +19,12 @@ variable "name_prefix" {
   description = "Name to prefix resources created"
 }
 
+variable "use_ssh" {
+  type = bool
+  description = "Use SSH key for access to Linux VM (default = \"true\")"
+  default = true
+}
+
 variable "pub_ssh_key" {
   type = string
   description = "Public SSH key for VM access. Provide an empty variable for windows VMs as it is not used."

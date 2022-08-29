@@ -9,8 +9,8 @@ locals {
   bootstrap_script = var.bootstrap_script == "" ? var.machine_type == "Linux" ? "${path.module}/templates/linux_user-data.sh" : "${path.module}/templates/win_user-data" : var.bootstrap_script
 }
 
-// Create a random admin password for windows VMs
-resource "random_password" "win-vm-password" {
+// Create a random admin password
+resource "random_password" "vm-password" {
   length            = 16
   min_upper         = 2
   min_lower         = 2
@@ -20,15 +20,35 @@ resource "random_password" "win-vm-password" {
 }
 
 // Create ssh key for linux if not provided
-module "ssh-key" {
-  source = "github.com/cloud-native-toolkit/terraform-azure-ssh-key?ref=v1.0.4"
+resource "tls_private_key" "key" {
+    count     = var.pub_ssh_key == "" ? 1 : 0
 
-  count = var.pub_ssh_key == "" ? 1 : 0
+    algorithm = "RSA"
+    rsa_bits  = "4096"
+}
 
-  key_name            = "${local.key_name}"
-  resource_group_name = data.azurerm_resource_group.resource_group.name
-  region              = data.azurerm_resource_group.resource_group.location
-  store_key_in_vault  = false
+resource "local_file" "private_key" {
+    count           = var.pub_ssh_key == "" ? 1 : 0
+
+    content         = tls_private_key.key[0].private_key_pem
+    filename        = "${path.cwd}/${local.key_name}"
+    file_permission = var.file_permissions
+}
+
+resource "local_file" "public_key" {
+    count           = var.pub_ssh_key == "" ? 1 : 0
+    
+    content         = tls_private_key.key[0].public_key_openssh
+    filename        = "${path.cwd}/${local.key_name}.pub"
+    file_permission = var.file_permissions
+}
+
+data "local_file" "pub_key" {
+    depends_on = [
+      local_file.public_key
+    ]
+
+    filename        = "${path.cwd}/${local.key_name}.pub"
 }
 
 // Get resource group details
@@ -83,8 +103,8 @@ data "azurerm_network_interface" "vm_nic" {
 
 // Linux VM
 
-resource "azurerm_linux_virtual_machine" "vm" {
-  count = var.machine_type == "Linux" ? 1 : 0
+resource "azurerm_linux_virtual_machine" "vm-ssh" {
+  count = var.machine_type == "Linux" && var.use_ssh ? 1 : 0
 
   name                = local.vm_name
   computer_name       = local.vm_name
@@ -100,8 +120,38 @@ resource "azurerm_linux_virtual_machine" "vm" {
 
   admin_ssh_key {
     username    = var.admin_username
-    public_key  = var.pub_ssh_key == "" ? module.ssh-key[0].pub_key : var.pub_ssh_key
+    public_key  = var.pub_ssh_key == "" ? file(data.local_file.pub_key.content) : var.pub_ssh_key
   }
+
+  os_disk {
+    name                  = local.os_disk_name
+    caching               = "ReadWrite"
+    storage_account_type  = var.storage_type
+  }
+
+  source_image_reference {
+    publisher = var.linux_image_publisher
+    offer     = var.linux_image_offer
+    sku       = var.linux_image_sku
+    version   = var.linux_image_version
+  }
+}
+
+resource "azurerm_linux_virtual_machine" "vm-pwd" {
+  count = var.machine_type == "Linux" && ! var.use_ssh ? 1 : 0
+
+  name                = local.vm_name
+  computer_name       = local.vm_name
+  resource_group_name = data.azurerm_resource_group.resource_group.name
+  location            = data.azurerm_resource_group.resource_group.location
+  size                = var.vm_size
+  admin_username      = var.admin_username
+  admin_password      = random_password.vm-password.result
+  custom_data         = base64encode(templatefile(local.bootstrap_script,{}))
+
+  network_interface_ids = [
+    data.azurerm_network_interface.vm_nic.id
+  ]
 
   os_disk {
     name                  = local.os_disk_name
@@ -129,7 +179,7 @@ resource "azurerm_windows_virtual_machine" "vm" {
   location            = data.azurerm_resource_group.resource_group.location
   size                = var.vm_size
   admin_username      = var.admin_username
-  admin_password      = random_password.win-vm-password.result
+  admin_password      = random_password.vm-password.result
   custom_data         = base64encode(templatefile(local.bootstrap_script,{}))
   network_interface_ids = [
     data.azurerm_network_interface.vm_nic.id
@@ -149,7 +199,7 @@ resource "azurerm_windows_virtual_machine" "vm" {
 }
 
 data "azurerm_virtual_machine" "vm" {
-  name                = var.machine_type == "Linux" ? azurerm_linux_virtual_machine.vm[0].name : azurerm_windows_virtual_machine.vm[0].name
+  name                = var.machine_type == "Linux" ? var._use_ssh ? azurerm_linux_virtual_machine.vm-ssh[0].name : azurerm_linux_virtual_machine.vm-pwd[0].name : azurerm_windows_virtual_machine.vm[0].name
   resource_group_name = data.azurerm_resource_group.resource_group.name
 }
 
