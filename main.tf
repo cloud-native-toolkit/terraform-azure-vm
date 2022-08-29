@@ -142,14 +142,15 @@ resource "azurerm_linux_virtual_machine" "vm-ssh" {
 resource "azurerm_linux_virtual_machine" "vm-pwd" {
   count = var.machine_type == "Linux" && ! var.use_ssh ? 1 : 0
 
-  name                = local.vm_name
-  computer_name       = local.vm_name
-  resource_group_name = data.azurerm_resource_group.resource_group.name
-  location            = data.azurerm_resource_group.resource_group.location
-  size                = var.vm_size
-  admin_username      = var.admin_username
-  admin_password      = random_password.vm-password.result
-  custom_data         = base64encode(templatefile(local.bootstrap_script,{}))
+  name                            = local.vm_name
+  computer_name                   = local.vm_name
+  resource_group_name             = data.azurerm_resource_group.resource_group.name
+  location                        = data.azurerm_resource_group.resource_group.location
+  size                            = var.vm_size
+  admin_username                  = var.admin_username
+  admin_password                  = random_password.vm-password.result
+  disable_password_authentication = false
+  custom_data                     = base64encode(templatefile(local.bootstrap_script,{}))
 
   network_interface_ids = [
     data.azurerm_network_interface.vm_nic.id
