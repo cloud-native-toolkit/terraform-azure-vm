@@ -4,6 +4,7 @@ locals {
   vm_name         = "${var.name_prefix}-vm"
   os_disk_name    = "${var.name_prefix}-osdisk"
   public_ip_name  = "${var.name_prefix}-pip"
+  key_name        = "${var.name_prefix}-key"
 
   bootstrap_script = var.bootstrap_script == "" ? var.machine_type == "Linux" ? "${path.module}/templates/linux_user-data.sh" : "${path.module}/templates/win_user-data" : var.bootstrap_script
 }
@@ -16,6 +17,18 @@ resource "random_password" "win-vm-password" {
   min_special       = 4
   min_numeric       = 2
   override_special  = "-#$%@"
+}
+
+// Create ssh key for linux if not provided
+module "ssh-key" {
+  source = "github.com/cloud-native-toolkit/terraform-azure-ssh-key?ref=v1.0.4"
+
+  count = var.pub_ssh_key == "" ? 1 : 0
+
+  key_name            = "${local.key_name}"
+  resource_group_name = data.azurerm_resource_group.resource_group.name
+  region              = data.azurerm_resource_group.resource_group.location
+  store_key_in_vault  = false
 }
 
 // Get resource group details
@@ -87,7 +100,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
 
   admin_ssh_key {
     username    = var.admin_username
-    public_key  = var.pub_ssh_key
+    public_key  = var.pub_ssh_key == "" ? module.ssh-key[0].pub_key : var.pub_ssh_key
   }
 
   os_disk {

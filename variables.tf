@@ -22,6 +22,7 @@ variable "name_prefix" {
 variable "pub_ssh_key" {
   type = string
   description = "Public SSH key for VM access. Provide an empty variable for windows VMs as it is not used."
+  default = ""
 }
 
 variable "public" {
@@ -76,7 +77,7 @@ variable "linux_image_offer" {
 variable "linux_image_sku" {
   type = string
   description = "Linux OS image SKU (defualt = \"16.04-LTS\")"
-  default = "16.04-LTS"
+  default = "18.04-LTS"
 }
 
 variable "linux_image_version" {
