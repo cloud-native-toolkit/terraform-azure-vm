@@ -125,6 +125,134 @@ versions:
         type: string
         description: Windows OS image version (default = \"latest\")
         default: latest
+    version: v2.0.1
+    outputs:
+      - name: id
+      - name: vm_public_ip
+      - name: vm_private_ip
+      - name: vm_public_fqdn
+      - name: admin_username
+      - name: admin_password
+        sensitive: true
+  - platforms: []
+    providers:
+      - name: azurerm
+        source: hashicorp/azurerm
+    dependencies:
+      - id: resource_group
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-azure-resource-group
+            version: '>= 1.0.0'
+      - id: subnet
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-azure-subnets
+            version: '>= 1.2.2'
+      - id: ssh_key
+        optional: true
+        refs:
+          - source: github.com/cloud-native-toolkit/teraform-azure-ssh-key
+            version: '>= 1.0.2'
+    variables:
+      - name: resource_group_name
+        type: string
+        description: >-
+          The name of the Azure resource group where the VM is to be
+          provisioned. The VM will be provisioned in the same location as the
+          resource group.
+        moduleRef:
+          id: resource_group
+          output: name
+      - name: subnet_id
+        type: string
+        description: The Azure subnet id to which to attach the virtual machine private NIC
+        moduleRef:
+          id: subnet
+          output: id
+      - name: machine_type
+        type: string
+        description: >-
+          The type of VM to create - \"Linux\" or \"Windows\" (default =
+          \"Linux\")
+        default: Linux
+      - name: name_prefix
+        type: string
+        description: Name to prefix resources created
+      - name: use_ssh
+        type: bool
+        description: Use SSH key for access to Linux VM (default = \"true\")
+        default: true
+      - name: pub_ssh_key
+        type: string
+        description: >-
+          Public SSH key for VM access. Provide an empty variable for windows
+          VMs as it is not used.
+        default: ''
+        optional: true
+        moduleRef:
+          id: ssh_key
+          output: pub_key
+      - name: public
+        type: bool
+        description: >-
+          Flag to indicate if VM shoudl have a public IP allocated (default =
+          \"true\")
+        default: true
+      - name: private_ip_address_allocation_type
+        type: string
+        description: >-
+          The Azure subnet private ip address alocation type - Dynamic or Static
+          (default = \"Dynamic\")
+        default: Dynamic
+      - name: vm_size
+        type: string
+        description: This is the size of Virtual Machine (defualt = \"Standard_F2\")
+        default: Standard_F2
+      - name: admin_username
+        type: string
+        description: Username for the admin user (default = \"adminuser\")
+        default: adminuser
+      - name: bootstrap_script
+        type: string
+        description: >-
+          Path to file with the bootstrap script (default =
+          \"./template/user-data.sh\")
+        default: ''
+      - name: storage_type
+        type: string
+        description: Storage account type (default = \"Standard_LRS\")
+        default: Standard_LRS
+      - name: linux_image_publisher
+        type: string
+        description: Linux image publisher name (default = \"Canonical\")
+        default: Canonical
+      - name: linux_image_offer
+        type: string
+        description: Linux OS image source offer (default = \"UbuntuServer\")
+        default: UbuntuServer
+      - name: linux_image_sku
+        type: string
+        description: Linux OS image SKU (defualt = \"16.04-LTS\")
+        default: 18.04-LTS
+      - name: linux_image_version
+        type: string
+        description: Linux OS image version (default = \"latest\")
+        default: latest
+      - name: win_image_publisher
+        type: string
+        description: Windows image publisher name (default = \"Canonical\")
+        default: MicrosoftWindowsServer
+      - name: win_image_offer
+        type: string
+        description: Windows OS image source offer (default = \"UbuntuServer\")
+        default: WindowsServer
+      - name: win_image_sku
+        type: string
+        description: Windows OS image SKU (defualt = \"16.04-LTS\")
+        default: 2016-Datacenter
+      - name: win_image_version
+        type: string
+        description: Windows OS image version (default = \"latest\")
+        default: latest
     version: v2.0.0
     outputs:
       - name: id
