@@ -21,14 +21,14 @@ resource "random_password" "vm-password" {
 
 // Create ssh key for linux if not provided
 resource "tls_private_key" "key" {
-    count     = var.pub_ssh_key == "" ? 1 : 0
+    count           = var.machine_type == "Linux" && var.pub_ssh_key == "" && var.use_ssh ? 1 : 0
 
-    algorithm = "RSA"
-    rsa_bits  = "4096"
+    algorithm       = "RSA"
+    rsa_bits        = "4096"
 }
 
 resource "local_file" "private_key" {
-    count           = var.pub_ssh_key == "" ? 1 : 0
+    count           = var.machine_type == "Linux" && var.pub_ssh_key == "" && var.use_ssh ? 1 : 0
 
     content         = tls_private_key.key[0].private_key_pem
     filename        = "${path.cwd}/${local.key_name}"
@@ -36,7 +36,7 @@ resource "local_file" "private_key" {
 }
 
 resource "local_file" "public_key" {
-    count           = var.pub_ssh_key == "" ? 1 : 0
+    count           = var.machine_type == "Linux" && var.pub_ssh_key == "" && var.use_ssh ? 1 : 0
     
     content         = tls_private_key.key[0].public_key_openssh
     filename        = "${path.cwd}/${local.key_name}.pub"
@@ -44,6 +44,8 @@ resource "local_file" "public_key" {
 }
 
 data "local_file" "pub_key" {
+    count           = var.machine_type == "Linux" && var.pub_ssh_key == "" && var.use_ssh ? 1 : 0
+
     depends_on = [
       local_file.public_key
     ]
@@ -120,7 +122,7 @@ resource "azurerm_linux_virtual_machine" "vm-ssh" {
 
   admin_ssh_key {
     username    = var.admin_username
-    public_key  = var.pub_ssh_key == "" ? file(data.local_file.pub_key.content) : var.pub_ssh_key
+    public_key  = var.pub_ssh_key == "" ? data.local_file.pub_key[0].content : var.pub_ssh_key
   }
 
   os_disk {
