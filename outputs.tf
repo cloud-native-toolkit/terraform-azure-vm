@@ -16,14 +16,14 @@ output "vm_public_fqdn" {
 
 output "admin_username" {
   depends_on = [
-    data.azurerm_linux_virtual_machine.vm
+    data.azurerm_virtual_machine.vm
   ]
   value = var.admin_username
 }
 
 output "admin_password" {
   depends_on = [
-    data.azurerm_linux_virtual_machine.vm
+    data.azurerm_virtual_machine.vm
   ]
   value = random_password.vm-password.result
   sensitive = true

@@ -32,7 +32,7 @@ resource "local_file" "private_key" {
 
     content         = tls_private_key.key[0].private_key_pem
     filename        = "${path.cwd}/${local.key_name}"
-    file_permission = var.file_permissions
+    file_permission = "0600"
 }
 
 resource "local_file" "public_key" {
@@ -40,7 +40,7 @@ resource "local_file" "public_key" {
     
     content         = tls_private_key.key[0].public_key_openssh
     filename        = "${path.cwd}/${local.key_name}.pub"
-    file_permission = var.file_permissions
+    file_permission = "0644"
 }
 
 data "local_file" "pub_key" {
