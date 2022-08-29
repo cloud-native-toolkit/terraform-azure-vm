@@ -1,107 +1,118 @@
 variable "resource_group_name" {
   type        = string
-  description = "The name of the Azure resource group where the NAT gateway has been provisioned"
+  description = "The name of the Azure resource group where the VM is to be provisioned. The VM will be provisioned in the same location as the resource group."
 }
 
-variable "region" {
-  type        = string
-  description = "The Azure location where the NAT gateway will be installed"
-}
-variable "virtual_network_name" {
-  type        = string
-  description = "The Azure virtual network name"
-}
-variable "network_interface_name" {
-  type        = string
-  description = "The Azure location where the NAT gateway will be installed"
-}
-
-variable "ip_configuration_name" {
-  type        = string
-  description = "The Azure location where the NAT gateway will be installed"
-
-}
 variable "subnet_id" {
   type        = string
-  description = "The Azure subnet id"
+  description = "The Azure subnet id to which to attach the virtual machine private NIC"
 }
-variable "private_ip_address_allocation" {
+
+variable "machine_type" {
+  type = string
+  description = "The type of VM to create - \"Linux\" or \"Windows\" (default = \"Linux\")"
+  default = "Linux"
+}
+
+variable "name_prefix" {
   type        = string
-  description = "The Azure subnet private ip address alocation"
+  description = "Name to prefix resources created"
+}
+
+variable "use_ssh" {
+  type = bool
+  description = "Use SSH key for access to Linux VM (default = \"true\")"
+  default = true
+}
+
+variable "pub_ssh_key" {
+  type = string
+  description = "Public SSH key for VM access. Provide an empty variable for windows VMs as it is not used."
+  default = ""
+}
+
+variable "public" {
+  type = bool
+  description = "Flag to indicate if VM shoudl have a public IP allocated (default = \"true\")"
+  default = true
+}
+
+variable "private_ip_address_allocation_type" {
+  type        = string
+  description = "The Azure subnet private ip address alocation type - Dynamic or Static (default = \"Dynamic\")"
   default     = "Dynamic"
 }
-variable "virtual_machine_name" {
-  type        = string
-  description = "This is the name of Azure VM"
 
-}
 variable "vm_size" {
   type        = string
-  description = "This is the size of Virtual Machine"
-
-}
-variable "delete_os_disk_on_termination" {
-  type        = bool
-  description = "Flag to delete os disk on termination"
-  default     = true
+  description = "This is the size of Virtual Machine (defualt = \"Standard_F2\")"
+  default     = "Standard_F2"
 }
 
-variable "delete_data_disks_on_termination" {
-  type        = bool
-  description = "Flag to delete data disk on termination"
-  default     = true
-}
-variable "storage_image_reference_publisher" {
+variable "admin_username" {
   type        = string
-  description = "This is the storage image refrence publisher"
-}
-variable "storage_image_reference_offer" {
-  type        = string
-  description = "This is the storage image refrence offer"
-}
-variable "storage_image_reference_sku" {
-  type        = string
-  description = "This is the storage image refrence sku"
-}
-variable "storage_image_reference_version" {
-  type        = string
-  description = "This is the storage image refrence version"
-}
-#Storage OS Disk Vairables
-variable "storage_os_disk_name" {
-  type        = string
-  description = "This is the storage OS disk name"
-}
-variable "storage_os_disk_caching" {
-  type        = string
-  description = "This is the storage OS disk cashing"
-}
-variable "storage_os_disk_create_option" {
-  type        = string
-  description = "This is the storage OS disk create option"
-}
-variable "storage_os_disk_managed_disk_type" {
-  type        = string
-  description = "This is the storage OS disk managed disk type"
-}
-#OS Profile
-variable "os_profile_computer_name" {
-  type        = string
-  description = "This is the storage OS Profile Computer Name"
-}
-variable "os_profile_admin_username" {
-  type        = string
-  description = "This is the storage OS Profile Admin Username"
-}
-variable "os_profile_admin_password" {
-  type        = string
-  description = "This is the storage OS Profile Passowrd"
-  sensitive   = true
-}
-variable "os_profile_linux_config_disable_password_authentication" {
-  type        = bool
-  description = "Flag to disable password authentication"
-  default     = false
-
+  description = "Username for the admin user (default = \"adminuser\")"
+  default     = "adminuser"
 }
 
+variable "bootstrap_script" {
+  type = string
+  description = "Path to file with the bootstrap script (default = \"./template/user-data.sh\")"
+  default = ""
+}
+
+variable "storage_type" {
+  type        = string
+  description = "Storage account type (default = \"Standard_LRS\")"
+  default     = "Standard_LRS"
+}
+
+// Linux OS image properties
+variable "linux_image_publisher" {
+  type = string
+  description = "Linux image publisher name (default = \"Canonical\")"
+  default = "Canonical"
+}
+
+variable "linux_image_offer" {
+  type = string
+  description = "Linux OS image source offer (default = \"UbuntuServer\")"
+  default = "UbuntuServer"
+}
+
+variable "linux_image_sku" {
+  type = string
+  description = "Linux OS image SKU (defualt = \"16.04-LTS\")"
+  default = "18.04-LTS"
+}
+
+variable "linux_image_version" {
+  type = string
+  description = "Linux OS image version (default = \"latest\")"
+  default = "latest"
+}
+
+// Windows OS image properties
+variable "win_image_publisher" {
+  type = string
+  description = "Windows image publisher name (default = \"Canonical\")"
+  default = "MicrosoftWindowsServer"
+}
+
+variable "win_image_offer" {
+  type = string
+  description = "Windows OS image source offer (default = \"UbuntuServer\")"
+  default = "WindowsServer"
+}
+
+variable "win_image_sku" {
+  type = string
+  description = "Windows OS image SKU (defualt = \"16.04-LTS\")"
+  default = "2016-Datacenter"
+}
+
+variable "win_image_version" {
+  type = string
+  description = "Windows OS image version (default = \"latest\")"
+  default = "latest"
+}

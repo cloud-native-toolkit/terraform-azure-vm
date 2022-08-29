@@ -1,12 +1,14 @@
+locals {
+  subnet_cidr = cidrsubnets(var.vnet_cidr, 2)
+}
+
 module "subnets" {
   source = "github.com/cloud-native-toolkit/terraform-azure-subnets"
 
   resource_group_name = module.resource_group.name
-  region              = var.region
-  vpc_name            = module.vnet.name
-  _count              = 3
-  ipv4_cidr_blocks    = ["10.1.1.0/24", "10.1.2.0/24", "10.1.3.0/24"]
-  enabled             = true
+  region              = module.resource_group.region
+  vnet_name           = module.vnet.name
+  ipv4_cidr_blocks    = ["${local.subnet_cidr[0]}"]
   acl_rules = [{
     name        = "ssh-inbound"
     action      = "Allow"
@@ -14,22 +16,8 @@ module "subnets" {
     source      = "*"
     destination = "*"
     tcp = {
-      port_min        = 22
-      port_max        = 22
-      source_port_min = 22
-      source_port_max = 22
-    }
-    }, {
-    name        = "ssh-outbound"
-    action      = "Allow"
-    direction   = "Outbound"
-    source      = "*"
-    destination = "*"
-    tcp = {
-      port_min        = 22
-      port_max        = 22
-      source_port_min = 22
-      source_port_max = 22
+      destination_port_range = "22"
+      source_port_range = "*"
     }
     }, {
     name        = "vpn-inbound"
@@ -38,16 +26,8 @@ module "subnets" {
     source      = "*"
     destination = "*"
     udp = {
-      port_min        = 1194
-      port_max        = 1194
-      source_port_min = 1194
-      source_port_max = 1194
+      destination_port_range = "1194"
+      source_port_range = "*"
     }
   }]
-}
-
-resource "null_resource" "print_enabled" {
-  provisioner "local-exec" {
-    command = "echo -n '${module.subnets.enabled}' > .enabled"
-  }
 }
