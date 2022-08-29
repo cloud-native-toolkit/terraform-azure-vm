@@ -199,11 +199,6 @@ resource "azurerm_windows_virtual_machine" "vm" {
 }
 
 data "azurerm_virtual_machine" "vm" {
-  name                = var.machine_type == "Linux" ? var._use_ssh ? azurerm_linux_virtual_machine.vm-ssh[0].name : azurerm_linux_virtual_machine.vm-pwd[0].name : azurerm_windows_virtual_machine.vm[0].name
+  name                = var.machine_type == "Linux" ? var.use_ssh ? azurerm_linux_virtual_machine.vm-ssh[0].name : azurerm_linux_virtual_machine.vm-pwd[0].name : azurerm_windows_virtual_machine.vm[0].name
   resource_group_name = data.azurerm_resource_group.resource_group.name
 }
-
-// Data disks
-# resource "azurerm_virtual_machine_data_disk_attachment" "data_disks" {
-  
-# }
