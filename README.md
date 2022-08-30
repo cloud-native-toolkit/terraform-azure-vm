@@ -75,6 +75,7 @@ This module has the following input variables:
 | subnet_id | Mandatory | | The id of the subnet to which to associate the virtual machine | 
 | machine_type | Optional | Linux | The type of VM to create - Linux or Windows |
 | use_ssh | Optional | true | Flag to use SSH only access or not for Linux VMs |
+| create_ssh | Optional | true | Flag to indicate whether to create an SSH key pair |
 | pub_ssh_key | Optional | \"\" | Public SSH key to use for Linux access. Leave blank to create a new one (key pair will be stored in terraform working directory and named with provided prefix) |
 | public | Optional | true | Flag to indicate if VM should have a public IP allocated |
 | private_ip_address_allocation_type | Optional | Dynamic | The Azure subnet private IP allocation type - Dynamic or Static |
