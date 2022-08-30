@@ -25,6 +25,13 @@ variable "use_ssh" {
   default = true
 }
 
+variable "create_ssh" {
+  type = bool
+  description = "Flag to determine whether to create an SSH key pair (default = \"true\")"
+  default = true
+  
+}
+
 variable "pub_ssh_key" {
   type = string
   description = "Public SSH key for VM access. Provide an empty variable for windows VMs as it is not used."
