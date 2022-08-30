@@ -25,6 +25,6 @@ output "admin_password" {
   depends_on = [
     data.azurerm_virtual_machine.vm
   ]
-  value = var.use_ssh ? "" : random_password.vm-password.result
+  value = var.use_ssh ? "" : random_password.vm-password[0].result
   sensitive = true
 }

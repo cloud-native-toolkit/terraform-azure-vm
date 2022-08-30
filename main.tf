@@ -11,6 +11,8 @@ locals {
 
 // Create a random admin password
 resource "random_password" "vm-password" {
+  count             = var.machine_type == "Windows" ||  ! var.use_ssh ? 1 : 0
+
   length            = 16
   min_upper         = 2
   min_lower         = 2
@@ -21,14 +23,14 @@ resource "random_password" "vm-password" {
 
 // Create ssh key for linux if not provided
 resource "tls_private_key" "key" {
-    count           = var.machine_type == "Linux" && var.pub_ssh_key == "" && var.use_ssh ? 1 : 0
+    count           = var.machine_type == "Linux" && var.create_ssh && var.use_ssh ? 1 : 0
 
     algorithm       = "RSA"
     rsa_bits        = "4096"
 }
 
 resource "local_file" "private_key" {
-    count           = var.machine_type == "Linux" && var.pub_ssh_key == "" && var.use_ssh ? 1 : 0
+    count           = var.machine_type == "Linux" && var.create_ssh && var.use_ssh ? 1 : 0
 
     content         = tls_private_key.key[0].private_key_pem
     filename        = "${path.cwd}/${local.key_name}"
@@ -36,7 +38,7 @@ resource "local_file" "private_key" {
 }
 
 resource "local_file" "public_key" {
-    count           = var.machine_type == "Linux" && var.pub_ssh_key == "" && var.use_ssh ? 1 : 0
+    count           = var.machine_type == "Linux" && var.create_ssh && var.use_ssh ? 1 : 0
     
     content         = tls_private_key.key[0].public_key_openssh
     filename        = "${path.cwd}/${local.key_name}.pub"
@@ -44,7 +46,7 @@ resource "local_file" "public_key" {
 }
 
 data "local_file" "pub_key" {
-    count           = var.machine_type == "Linux" && var.pub_ssh_key == "" && var.use_ssh ? 1 : 0
+    count           = var.machine_type == "Linux" && var.create_ssh && var.use_ssh ? 1 : 0
 
     depends_on = [
       local_file.public_key
@@ -148,7 +150,7 @@ resource "azurerm_linux_virtual_machine" "vm-pwd" {
   location                        = data.azurerm_resource_group.resource_group.location
   size                            = var.vm_size
   admin_username                  = var.admin_username
-  admin_password                  = random_password.vm-password.result
+  admin_password                  = random_password.vm-password[0].result
   disable_password_authentication = false
   custom_data                     = base64encode(templatefile(local.bootstrap_script,{}))
 
@@ -182,7 +184,7 @@ resource "azurerm_windows_virtual_machine" "vm" {
   location            = data.azurerm_resource_group.resource_group.location
   size                = var.vm_size
   admin_username      = var.admin_username
-  admin_password      = random_password.vm-password.result
+  admin_password      = random_password.vm-password[0].result
   custom_data         = base64encode(templatefile(local.bootstrap_script,{}))
   network_interface_ids = [
     data.azurerm_network_interface.vm_nic.id

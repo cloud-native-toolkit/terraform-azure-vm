@@ -20,13 +20,23 @@ module "subnets" {
       source_port_range = "*"
     }
     }, {
-    name        = "vpn-inbound"
+    name        = "rdp-inbound-tcp"
+    action      = "Allow"
+    direction   = "Inbound"
+    source      = "*"
+    destination = "*"
+    tcp = {
+      destination_port_range = "3389"
+      source_port_range = "*"
+    }
+  }, {
+    name        = "rdp-inbound-udp"
     action      = "Allow"
     direction   = "Inbound"
     source      = "*"
     destination = "*"
     udp = {
-      destination_port_range = "1194"
+      destination_port_range = "3389"
       source_port_range = "*"
     }
   }]
