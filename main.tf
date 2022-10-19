@@ -56,7 +56,15 @@ data "local_file" "pub_key" {
 }
 
 // Get resource group details
+resource "null_resource" "print_plan" {
+  provisioner "local-exec" {
+    command = "echo 'Adding ${local.vm_name} to ${var.resource_group_name}'"
+  }
+}
+
 data "azurerm_resource_group" "resource_group" {
+  depends_on = [null_resource.print_plan]
+  
   name = var.resource_group_name
 }
 
